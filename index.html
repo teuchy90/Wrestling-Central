@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101827">
+<title>Wrestling Central 3.0</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1120;--panel:#151f32;--panel2:#1c2a42;--line:#30415e;--text:#f4f6fb;--muted:#aab7cc;--gold:#f3c65e;--blue:#83b3ff;--green:#77d8a2;--red:#f09aa4}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1c2c49 0,#0b1120 48%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+header,.wrap{max-width:1120px;margin:auto}header{padding:24px 17px 14px}h1{font-size:clamp(28px,5vw,43px);margin:0;letter-spacing:.035em}header p,.muted{color:var(--muted)}header p{margin:4px 0}.wrap{padding:0 16px 44px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0 17px}.stat,.panel{background:rgba(21,31,50,.96);border:1px solid var(--line);border-radius:15px;padding:13px}.stat b{font-size:24px;display:block}.stat span,.muted{font-size:12px}
+nav{display:flex;gap:7px;overflow:auto;position:sticky;top:0;padding:7px 0 13px;background:rgba(11,17,32,.96);z-index:5}
+button,.tab{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 12px;border-radius:10px;font-weight:650;cursor:pointer;white-space:nowrap}
+button.primary,.tab.active{background:#315b99;border-color:#5483c4}button.danger{background:#4b2632;border-color:#75414e}button:disabled{opacity:.4;cursor:not-allowed}
+section{display:none}section.active{display:block}h2{font-size:21px;margin:5px 0 12px}h3{font-size:16px;margin:0 0 8px}
+label{display:block;color:var(--muted);font-size:12px;margin:10px 0 5px}input,select,textarea{width:100%;background:#0c1628;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:11px;font:inherit}textarea{min-height:70px;resize:vertical}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}.row{display:flex;gap:9px;flex-wrap:wrap}.row>div{flex:1;min-width:145px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.actions button{font-size:13px}
+.item{background:#101a2b;border:1px solid var(--line);border-radius:12px;padding:12px;margin:9px 0}.item strong{display:block}.tag{display:inline-block;border:1px solid var(--line);border-radius:30px;padding:3px 8px;color:var(--muted);font-size:11px;margin:4px 4px 0 0}
+.notice{background:#252319;border-left:3px solid var(--gold);padding:10px 12px;border-radius:7px;color:#e9dfc5;font-size:13px;margin:10px 0}
+.link{color:#a9caff;text-decoration:none}.link:hover{text-decoration:underline}.empty{padding:14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);text-align:center}
+.status{display:inline-block;border-radius:30px;padding:3px 8px;font-size:11px;font-weight:700}.confirmed{background:#173c30;color:#8be1b1}.unclear{background:#46391b;color:#f5d17c}.missing{background:#263449;color:#c2ccda}
+small{color:var(--muted)}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:25px}
+@media(max-width:520px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style></head>
+<body>
+<header><h1>🤼 WRESTLING CENTRAL</h1><p>Deine persönliche Wrestling-Recherche · Version 2.0</p></header>
+<div class="wrap">
+<div class="stats"><div class="stat"><b id="nWatch">0</b><span>Watchlist</span></div><div class="stat"><b id="nFav">0</b><span>Favoriten</span></div><div class="stat"><b id="nHof">0/25</b><span>Hall of Fame</span></div><div class="stat"><b id="nFind">0</b><span>Fundstellen</span></div></div>
+<nav>
+<button class="tab active" data-tab="research">Recherche</button><button class="tab" data-tab="findings">Fundstellen</button><button class="tab" data-tab="watch">Watchlist</button><button class="tab" data-tab="favorites">Favoriten</button><button class="tab" data-tab="hof">Hall of Fame</button><button class="tab" data-tab="ratings">Bewertungen</button><button class="tab" data-tab="sources">Quellen</button><button class="tab" data-tab="wrapped">Wrapped</button><button class="tab" data-tab="backup">Daten</button>
+</nav>
+
+<section id="research" class="active">
+<h2>Recherche-Zentrale</h2>
+<div class="panel">
+<label for="q">Suchbegriff</label><input id="q" placeholder="Wrestler, Match, Event, Promotion …">
+<div class="row"><div><label for="scope">Was suchst du?</label><select id="scope"><option value="all">Alles</option><option value="wrestler">Wrestler / Karriere</option><option value="match">Matches</option><option value="event">Events</option><option value="promotion">Promotion</option><option value="video">Video / Archiv</option></select></div>
+<div><label for="provider">Streamingquelle eingrenzen</label><select id="provider"><option>Alle Quellen</option></select></div></div>
+<div class="actions"><button class="primary" id="runResearch">Recherche starten ↗</button><button id="saveQueryWatch">Suchbegriff auf Watchlist</button><button id="saveQueryFav">Als Favorit speichern</button></div>
+<p class="muted">Die passenden Suchwege erscheinen nach dem Start direkt hier. Tippe die gewünschten Links einzeln an. Das funktioniert zuverlässiger mit Safari auf dem iPhone.</p>
+</div>
+<div class="panel" id="researchResults" style="display:none;margin-top:11px"></div>
+<div class="grid" style="margin-top:11px">
+<div class="panel"><h3>Match- und Wrestler-Datenbank</h3><p><a class="link" href="https://www.cagematch.net/?id=666&search=" target="_blank">Cagematch: Namenssuche ↗</a></p><p class="muted">Wrestler, Promotions, Titel, Tag Teams und Stables.</p></div>
+<div class="panel"><h3>Erweiterte Matchsuche</h3><p><a class="link" href="https://www.cagematch.net/?id=112&view=search" target="_blank">Cagematch: Matchsuche ↗</a></p><p class="muted">Für Teilnehmer, Eventnamen, Promotion und Zeitraum.</p></div>
+<div class="panel"><h3>Event-Datenbank</h3><p><a class="link" href="https://www.cagematch.net/?id=1&view=search" target="_blank">Cagematch: Eventsuche ↗</a></p><p class="muted">Historische und kommende Veranstaltungen.</p></div>
+<div class="panel"><h3>Streaming-Übersicht</h3><p><a class="link" href="https://wheresports.com/wrestling/" target="_blank">WhereSports Wrestling ↗</a></p><p class="muted">Zusätzlicher Überblick zu Wrestling-Übertragungen.</p></div>
+</div>
+<div class="panel" style="margin-top:11px">
+<h3>Fundstelle direkt speichern</h3>
+<label for="fTitle">Titel / Match / Event</label><input id="fTitle" placeholder="z. B. Kevin Owens vs. Adam Cole">
+<div class="row"><div><label for="fSource">Quelle / Anbieter</label><select id="fSource"></select></div><div><label for="fStatus">Verfügbarkeit</label><select id="fStatus"><option value="confirmed">Gefunden / bestätigt</option><option value="unclear">Unklar / noch prüfen</option><option value="missing">Nicht gefunden</option></select></div></div>
+<label for="fUrl">Direkter Link zur Fundstelle</label><input id="fUrl" type="url" placeholder="https://…">
+<label for="fNote">Notiz / Prüfhinweis</label><textarea id="fNote" placeholder="z. B. Matchseite gefunden, Video-Verfügbarkeit noch nicht bestätigt"></textarea>
+<div class="actions"><button class="primary" id="saveFinding">Fundstelle speichern</button></div>
+</div>
+<div class="notice">Wichtig: Cagematch kann Matchhistorien und Eventdaten liefern, bestätigt aber nicht automatisch, dass ein Match in deinem Streamingabo abspielbar ist. Deshalb trennen wir Datenbanktreffer und tatsächlich geprüfte Videoverfügbarkeit.</div>
+</section>
+
+<section id="findings"><h2>Deine recherchierten Fundstellen</h2><p class="muted">Hier sammelst du konkrete Treffer inklusive Link und Verfügbarkeitsstatus.</p><div id="findingList"></div></section>
+<section id="watch"><h2>Watchlist</h2><div class="panel"><label for="wTitle">Match oder Event</label><input id="wTitle" placeholder="Titel / Teilnehmer"><label for="wSource">Streamingquelle</label><select id="wSource"></select><label for="wNote">Notiz</label><textarea id="wNote"></textarea><button class="primary" id="addWatch">Speichern</button></div><div id="watchList"></div></section>
+<section id="favorites"><h2>Favoriten</h2><div class="panel"><label for="vTitle">Name</label><input id="vTitle" placeholder="Wrestler, Match, Event oder Promotion"><div class="row"><div><label for="vType">Typ</label><select id="vType"><option>Wrestler</option><option>Match</option><option>Event</option><option>Promotion</option></select></div><div><label for="vRating">Sterne</label><select id="vRating"><option value="">Keine</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div></div><label for="vNote">Notiz</label><textarea id="vNote"></textarea><button class="primary" id="addFav">Favorit speichern</button></div><div id="favList"></div></section>
+<section id="hof"><h2>Hall of Fame · Top 25</h2><div class="panel"><label for="hTitle">Match</label><input id="hTitle" placeholder="Teilnehmer"><label for="hEvent">Event / Promotion / Datum</label><input id="hEvent" placeholder="Event, Promotion, Jahr"><label for="hStars">Bewertung</label><select id="hStars"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><label for="hNote">Warum gehört es in deine Top 25?</label><textarea id="hNote"></textarea><button class="primary" id="addHof">In Hall of Fame aufnehmen</button></div><div id="hofList"></div></section>
+<section id="ratings"><h2>Persönliche Bewertungen</h2><div class="panel"><label for="rTitle">Match</label><input id="rTitle" placeholder="Match / Teilnehmer"><label for="rStars">Bewertung</label><select id="rStars"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><label for="rNote">Notiz</label><textarea id="rNote"></textarea><button class="primary" id="addRating">Bewertung speichern</button></div><div id="ratingList"></div></section>
+<section id="sources"><h2>Deine 15 Quellen</h2><div id="sourceList" class="grid"></div></section>
+<section id="wrapped"><h2>Wrestling Wrapped</h2><div class="panel" id="wrappedStats"></div></section>
+<section id="backup"><h2>Daten sichern</h2><div class="notice">Alle persönlichen Einträge werden lokal in diesem Browser gespeichert. Exportiere regelmäßig eine Sicherung.</div><div class="actions"><button class="primary" id="export">Exportieren</button><button id="importBtn">Importieren</button><input id="importFile" type="file" accept="application/json" hidden></div><button class="danger" id="clear">Alle persönlichen Einträge löschen</button></section>
+<footer>Wrestling Central · Keine offizielle Verbindung zu den Streaminganbietern · Suchtreffer und Verfügbarkeit bitte beim Anbieter gegenprüfen.</footer>
+</div>
+<script>
+const sources=[
+["WWE / Netflix","https://www.netflix.com/"],["NJPW World","https://watch.njpwworld.com/"],["YouTube Premium","https://www.youtube.com/"],["wXw YouTube-Mitgliedschaft","https://www.youtube.com/@wXwGermany"],["EVE Riot Grrrls YouTube-Mitgliedschaft","https://www.youtube.com/"],["Wrestle Universe","https://www.wrestle-universe.com/"],["Stardom World","https://www.stardom-world.com/"],["TrillerTV / FITE","https://www.trillertv.com/"],["AEW / MyAEW","https://www.allelitewrestling.com/"],["IWTV","https://independentwrestling.tv/"],["TNA+","https://watch.tnawrestling.com/"],["Highspots.tv","https://www.highspots.tv/"],["RevPro On Demand","https://ondemand.revolutionprowrestling.com/"],["Hooked on Wrestling","https://www.hookedonwrestling.co.uk/"],["Ring of Honor","https://www.ringofhonor.com/"]];
+const blank={watch:[],favorites:[{title:"Kevin Owens",type:"Wrestler",rating:"",note:"Lieblingswrestler"},{title:"Adam Cole",type:"Wrestler",rating:"",note:"Lieblingswrestler"}],hof:[],ratings:[],findings:[]};
+let d;try{d={...blank,...JSON.parse(localStorage.getItem("wc2")||"{}")}}catch(e){d=structuredClone(blank)}
+const $=id=>document.getElementById(id), esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function persist(){localStorage.setItem("wc2",JSON.stringify(d));render()}
+function stars(n){return n?`<span style="color:var(--gold)">${"★".repeat(+n)}${"☆".repeat(5-+n)}</span>`:""}
+function status(s){return s==="confirmed"?'<span class="status confirmed">Gefunden / bestätigt</span>':s==="unclear"?'<span class="status unclear">Unklar</span>':'<span class="status missing">Nicht gefunden</span>'}
+function card(title,sub,detail,buttons){return `<div class="item"><strong>${esc(title)}</strong><small>${esc(sub||"")}</small><div>${detail||""}</div><div class="actions">${buttons||""}</div></div>`}
+function del(k,i){d[k].splice(i,1);persist()}
+function render(){
+ $("nWatch").textContent=d.watch.length;$("nFav").textContent=d.favorites.length;$("nHof").textContent=d.hof.length+"/25";$("nFind").textContent=d.findings.length;
+ $("findingList").innerHTML=d.findings.length?d.findings.map((x,i)=>card(x.title,x.source,status(x.status)+(x.url?` <a class="link" href="${esc(x.url)}" target="_blank" rel="noopener">Fundstelle öffnen ↗</a>`:""),esc(x.note)+`<div class="actions"><button onclick="del('findings',${i})">Entfernen</button></div>`)).join(""):'<div class="empty">Noch keine Fundstellen gespeichert.</div>';
+ $("watchList").innerHTML=d.watch.length?d.watch.map((x,i)=>card(x.title,x.source,esc(x.note),`<button onclick="toFav(${i})">Als Favorit</button><button class="danger" onclick="del('watch',${i})">Entfernen</button>`)).join(""):'<div class="empty">Deine Watchlist ist leer.</div>';
+ $("favList").innerHTML=d.favorites.length?d.favorites.map((x,i)=>card(x.title,x.type,stars(x.rating)+" "+esc(x.note),`<button class="danger" onclick="del('favorites',${i})">Entfernen</button>`)).join(""):'<div class="empty">Noch keine Favoriten.</div>';
+ $("hofList").innerHTML=d.hof.length?d.hof.map((x,i)=>card("#"+(i+1)+" · "+x.title,x.event,stars(x.rating)+" "+esc(x.note),`<button onclick="shiftHof(${i},-1)" ${i===0?"disabled":""}>↑</button><button onclick="shiftHof(${i},1)" ${i===d.hof.length-1?"disabled":""}>↓</button><button class="danger" onclick="del('hof',${i})">Entfernen</button>`)).join(""):'<div class="empty">Deine Top 25 warten auf deine Matches.</div>';
+ $("ratingList").innerHTML=d.ratings.length?d.ratings.map((x,i)=>card(x.title,"Persönliche Bewertung",stars(x.rating)+" "+esc(x.note),`<button class="danger" onclick="del('ratings',${i})">Entfernen</button>`)).join(""):'<div class="empty">Noch keine Bewertungen.</div>';
+ const avg=d.ratings.length?(d.ratings.reduce((a,x)=>a+(+x.rating),0)/d.ratings.length).toFixed(1):"–";
+ $("wrappedStats").innerHTML=`<h3>Dein bisheriges Wrestling-Jahr</h3><p>${d.ratings.length} bewertete Matches · Durchschnitt ${avg}/5 Sterne</p><p>${d.favorites.length} Favoriten · ${d.watch.length} Watchlist-Einträge · ${d.hof.length} Hall-of-Fame-Matches · ${d.findings.length} recherchierte Fundstellen</p><small>Sehzeiten und tatsächliche Streams werden nicht automatisch von den Plattformen ausgelesen.</small>`;
+}
+function toFav(i){let x=d.watch[i];d.favorites.push({title:x.title,type:"Match / Event",rating:"",note:x.note||""});persist()}
+function shiftHof(i,dir){let j=i+dir;if(j<0||j>=d.hof.length)return;[d.hof[i],d.hof[j]]=[d.hof[j],d.hof[i]];persist()}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll("section").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.tab).classList.add("active")});
+function fillSelect(id,all=false){$(id).innerHTML=(all?'<option>Alle Quellen</option>':"")+sources.map(s=>`<option>${esc(s[0])}</option>`).join("")}
+fillSelect("provider",true);["fSource","wSource"].forEach(id=>fillSelect(id));
+$("sourceList").innerHTML=sources.map(s=>`<div class="panel"><b>${esc(s[0])}</b><p><a class="link" target="_blank" rel="noopener" href="${s[1]}">Dienst öffnen ↗</a></p></div>`).join("");
+$("runResearch").onclick=()=>{
+ const q=$("q").value.trim();if(!q){alert("Bitte gib einen Suchbegriff ein.");return}
+ const term=encodeURIComponent(q),scope=$("scope").value,prov=$("provider").value;
+ const google=(extra)=>"https://www.google.com/search?q="+encodeURIComponent(q+" wrestling "+extra);
+ const jobs=[];
+ if(scope==="all"||scope==="wrestler"||scope==="promotion")jobs.push(["Cagematch Namenssuche","https://www.cagematch.net/?id=666&search="+term]);
+ if(scope==="all"||scope==="match")jobs.push(["Cagematch Matchdatenbank","https://www.google.com/search?q="+encodeURIComponent("site:cagematch.net/?id=112 "+q)]);
+ if(scope==="all"||scope==="match")jobs.push(["Cagematch erweiterte Matchsuche","https://www.cagematch.net/?id=112&view=search"]);
+ if(scope==="all"||scope==="event")jobs.push(["Cagematch Eventsuche","https://www.cagematch.net/?id=1&view=search"]);
+ if(scope==="all"||scope==="video")jobs.push(["Video- und Archivsuche","https://www.youtube.com/results?search_query="+term+"+wrestling"]);
+ jobs.push(["Websuche","https://www.google.com/search?q="+encodeURIComponent(q+" wrestling "+(prov!=="Alle Quellen"?prov:""))]);
+ if(prov!=="Alle Quellen"){const s=sources.find(x=>x[0]===prov);if(s)jobs.push([prov+" Katalogsuche",google("site:"+new URL(s[1]).hostname)])}
+ const results=$("researchResults");
+ results.innerHTML='<h3>Suchwege für: '+esc(q)+'</h3><p class="muted">Safari blockiert häufig automatisch geöffnete mehrere Tabs. Deshalb kannst du die Recherche hier gezielt einzeln öffnen:</p>'+jobs.slice(0,6).map((j,i)=>'<p><a class="link" href="'+esc(j[1])+'" target="_blank" rel="noopener noreferrer">'+(i+1)+'. '+esc(j[0])+' ↗</a></p>').join('');
+ results.style.display="block";
+};
+$("saveFinding").onclick=()=>{let t=$("fTitle").value.trim();if(!t)return alert("Bitte Titel angeben.");d.findings.unshift({title:t,source:$("fSource").value,status:$("fStatus").value,url:$("fUrl").value.trim(),note:$("fNote").value.trim()});["fTitle","fUrl","fNote"].forEach(id=>$(id).value="");persist();document.querySelector('[data-tab="findings"]').click()};
+$("saveQueryWatch").onclick=()=>{let t=$("q").value.trim();if(!t)return;d.watch.push({title:t,source:$("provider").value,note:"Aus der Recherche übernommen"});persist()};
+$("saveQueryFav").onclick=()=>{let t=$("q").value.trim();if(!t)return;d.favorites.push({title:t,type:$("scope").selectedOptions[0].text,rating:"",note:"Aus der Recherche übernommen"});persist()};
+$("addWatch").onclick=()=>{let t=$("wTitle").value.trim();if(!t)return;d.watch.push({title:t,source:$("wSource").value,note:$("wNote").value});$("wTitle").value=$("wNote").value="";persist()};
+$("addFav").onclick=()=>{let t=$("vTitle").value.trim();if(!t)return;d.favorites.push({title:t,type:$("vType").value,rating:$("vRating").value,note:$("vNote").value});$("vTitle").value=$("vNote").value="";persist()};
+$("addHof").onclick=()=>{let t=$("hTitle").value.trim();if(!t)return;if(d.hof.length>=25)return alert("Die Hall of Fame ist auf 25 Matches begrenzt.");d.hof.push({title:t,event:$("hEvent").value,rating:$("hStars").value,note:$("hNote").value});$("hTitle").value=$("hEvent").value=$("hNote").value="";persist()};
+$("addRating").onclick=()=>{let t=$("rTitle").value.trim();if(!t)return;d.ratings.push({title:t,rating:$("rStars").value,note:$("rNote").value});$("rTitle").value=$("rNote").value="";persist()};
+$("export").onclick=()=>{let a=document.createElement("a"),u=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));a.href=u;a.download="wrestling-central-sicherung.json";a.click();URL.revokeObjectURL(u)};
+$("importBtn").onclick=()=>$("importFile").click();$("importFile").onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{d={...blank,...JSON.parse(r.result)};persist();alert("Sicherung importiert.")}catch(x){alert("Datei konnte nicht gelesen werden.")}};r.readAsText(f)};
+$("clear").onclick=()=>{if(confirm("Alle persönlichen Einträge wirklich löschen?")){d=structuredClone(blank);persist()}};render();
+</script></body></html>
